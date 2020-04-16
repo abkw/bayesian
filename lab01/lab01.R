@@ -48,7 +48,7 @@ plot_mean_sd()
   Post_draws<-rinvchisq(10000,10000)
   hist(Post_draws)
 
-  #They both follow the same distribution
+  #They both follow the same distributi on
   #2.b
   phi = pnorm(sqrt(sigma_square)/sqrt(2), mean = 0, sd = 1)
   gini = 2*phi-1
@@ -58,10 +58,25 @@ plot_mean_sd()
   #2.3
   #Calculating 90% equal tail credible interval
   p.interval(gini,prob = 0.9, plot = TRUE, HPD = FALSE)
-
+  
   #Calculating HPD interval
   p.interval(gini,prob = 0.9, plot = TRUE, HPD = TRUE)
   #The HPD interval takes the interval considering the highest density, wheras the equal tail inverval considers tails equally (0.05 left and right)
   
   
+#Question 3
+  library(rotations)
+  data = c(40, 303, 326, 285, 296, 314, 20, 308, 299, 296)
+  radians_data = c(-2.44, 2.14, 2.54, 1.83, 2.02, 2.33, -2.79, 2.23, 2.07, 2.02)
+  plot(radians_data, dvmises(r, kappa = 10), type = "l", ylab = "f(r)", ylim = c(0, 100))
+  
+  k = 3 #Our initial belief about k
+  mu = 2.39
+  lambda = 1
+  #Claculating the prior for k
+  kPrior = lambda*exp(-lambda*k)
+  grid = expand.grid(x = data, y = k_exp)
+  kVector = besselI(grid,0)
+  likli = prod(exp(kVector*cos(radians_data-mu)))
+  posterior = likli * kPrior
   
