@@ -65,18 +65,29 @@ plot_mean_sd()
   
   
 #Question 3
-  library(rotations)
-  data = c(40, 303, 326, 285, 296, 314, 20, 308, 299, 296)
-  radians_data = c(-2.44, 2.14, 2.54, 1.83, 2.02, 2.33, -2.79, 2.23, 2.07, 2.02)
-  plot(radians_data, dvmises(r, kappa = 10), type = "l", ylab = "f(r)", ylim = c(0, 100))
-  
-  k = 3 #Our initial belief about k
+  library(LaplacesDemon)
+  radians_data = c(-2.44,2.14,2.54,1.83,2.02,2.33,-2.79,2.23,2.07,2.02)
+  angles = c(40,303,326,285,296,314,20,308,299,296)
+  k_exp = exp(-radians_data)
+  k_grid = expand.grid(x = angles, y = k_exp)
   mu = 2.39
+  x = 0.6
   lambda = 1
-  #Claculating the prior for k
-  kPrior = lambda*exp(-lambda*k)
-  grid = expand.grid(x = data, y = k_exp)
-  kVector = besselI(grid,0)
-  likli = prod(exp(kVector*cos(radians_data-mu)))
-  posterior = likli * kPrior
+  k_prior = exp(-lambda*x) # prior
+  grid_k_values = k_grid[,2]
+  calculate_posterior = function(){
+    posterior_values = c()
+    for(i in 1:length(k_grid)){
+      I_0 = besselI(grid_k_values[i],0)
+      prob = exp(grid_k_values[i]*cos(radians_data-mu))/(2*pi*I_0)
+      likehood = prod(prob)
+      posterior_values = c(posterior_values,k_prior*likehood)
+    }
+    return(posterior_values)
+  }
+  grid_angels = k_grid[,1]
+  #hist(posterior_values)
+  posterior = calculate_posterior()
+  plot(density(posterior, bw = 2), main = "Posterior Distribution of k for the Wind Direction")
+  
   
