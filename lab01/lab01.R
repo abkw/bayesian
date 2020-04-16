@@ -66,20 +66,21 @@ plot_mean_sd()
   
 #Question 3
   library(LaplacesDemon)
+  options(digits = 21)
   radians_data = c(-2.44,2.14,2.54,1.83,2.02,2.33,-2.79,2.23,2.07,2.02)
   angles = c(40,303,326,285,296,314,20,308,299,296)
   k_exp = exp(-radians_data)
   k_grid = expand.grid(x = angles, y = k_exp)
   mu = 2.39
-  x = 0.6
+  x = 3
   lambda = 1
   k_prior = exp(-lambda*x) # prior
   grid_k_values = k_grid[,2]
   calculate_posterior = function(){
     posterior_values = c()
     for(i in 1:length(k_grid)){
-      I_0 = besselI(grid_k_values[i],0)
-      prob = exp(grid_k_values[i]*cos(radians_data-mu))/(2*pi*I_0)
+      bessel_values = besselI(grid_k_values[i],0)
+      prob = exp(grid_k_values[i]*cos(radians_data-mu))/(2*pi*bessel_values)
       likehood = prod(prob)
       posterior_values = c(posterior_values,k_prior*likehood)
     }
@@ -90,4 +91,11 @@ plot_mean_sd()
   posterior = calculate_posterior()
   plot(density(posterior, bw = 2), main = "Posterior Distribution of k for the Wind Direction")
   
+ #3.2
+  calculate_mode <- function(v) {
+    uniqv <- unique(v)
+    uniqv[which.max(tabulate(match(v, uniqv)))]
+  }
+  calculate_mode(posterior)
+  max(posterior)
   
